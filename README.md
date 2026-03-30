@@ -28,24 +28,35 @@ While the core functionality of **FitGirl Repacks Manager** is and will remain f
 - **🛠️ Advanced Tools**: Batch extraction, checksum verification, and automatic update notifications.
 - **🌟 Exclusive Themes**: Deep customization of the app's aesthetic.
 
-*Stay tuned for more updates!*
+_Stay tuned for more updates!_
 
 ---
 
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="assets/library.png" width="800" alt="Library View">
+  <img src="assets/image1.png" width="800" alt="Library View">
   <br>
   <em>Dashboard & Library Overview</em>
 </p>
 
 <p align="center">
-  <img src="assets/details.png" width="800" alt="Details View">
+  <img src="assets/image2.png" width="800" alt="Details View">
   <br>
-  <em>Rich Game Metadata & Installation Options</em>
+  <em>FitGirl Repacks Manager</em>
 </p>
 
+<p align="center">
+  <img src="assets/image3.png" width="800" alt="Details View">
+  <br>
+  <em>IGDB</em>
+</p>
+
+<p align="center">
+  <img src="assets/image4.png" width="800" alt="Details View">
+  <br>
+  <em>Fullscreen Mode</em>
+</p>
 ---
 
 ## 🚀 Getting Started
