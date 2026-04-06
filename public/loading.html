@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Loading FitGirl Repacks Manager</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0b0d11;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            -webkit-app-region: drag;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .logo-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-blur {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('app_icon.png') no-repeat center;
+            background-size: contain;
+            filter: blur(20px) opacity(0.5);
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        .logo {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            background: url('app_icon.png') no-repeat center;
+            background-size: contain;
+            z-index: 1;
+        }
+
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: #4dabf7;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        .text {
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            color: #adb5bd;
+            text-transform: uppercase;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); filter: blur(20px) opacity(0.5); }
+            50% { transform: scale(1.1); filter: blur(25px) opacity(0.7); }
+            100% { transform: scale(1); filter: blur(20px) opacity(0.5); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <div class="logo-blur"></div>
+            <div class="logo"></div>
+        </div>
+        <div class="loader"></div>
+        <div class="text">Loading FitGirl Repacks Manager</div>
+    </div>
+</body>
+</html>
