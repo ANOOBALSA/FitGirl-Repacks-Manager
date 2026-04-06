@@ -10,25 +10,25 @@
 
 ## ✨ Key Features
 
-- **🔍 Smart Discovery**: Browse the latest and most popular repacks with real-time updates.
-- **📚 Library Management**: Keep track of your installed games, play times, and status.
-- **🖼️ Rich Metadata**: Automatic fetching of game descriptions, ratings, and high-quality artwork via IGDB.
-- **⚡ Integrated Downloader**: Built-in torrent support for seamless downloading without external clients. (in progress)
-- **📦 Automated Extraction**: One-click extraction and installation handling for various archive formats (RAR/7Z).
-- **🎨 Modern UI**: Clean, responsive, and modern interface.
+- **⚡ Modern Dashboard**: Instantly access the latest repacks and manage your library from a sleek, unified interface.
+- **🔍 Smart Discovery**: Browse the entire FitGirl catalog.
+- **📦 One-Click Extraction**: Automated handling of RAR and 7Z archives for a hassle-free installation process.
+- **📚 Library Management**: Track your collection, record play times, and manage installation status effortlessly.
 
 ---
 
-## 💎 Roadmap & Premium Features
+## 💎 Premium Membership
 
-While the core functionality of **FitGirl Repacks Manager** is and will remain free, we are working on premium features for our power users:
+Support the continued development of **FitGirl Repacks Manager** and unlock features for a one-time **$5 fee**.
 
-- **🚀 Pro Downloader**: Enhanced multi-connection downloading for even faster speeds.
-- **☁️ Cloud Sync**: Sync your game library and play time across all your devices.
-- **🛠️ Advanced Tools**: Batch extraction, checksum verification, and automatic update notifications.
-- **🌟 Exclusive Themes**: Deep customization of the app's aesthetic.
+**Why go Premium?**
 
-_Stay tuned for more updates!_
+- 🚀 **Support Development**: Directly contribute to the project's maintenance and new feature development.
+- ☁️ **Cloud Sync**: Sync your library, play times, and settings across all your devices.
+- 🔔 **Release Notifications**: Get notified instantly when a new repack is available.
+- 🛠️ **Advanced Tools**: Priority access to new automation tools and batch processing.
+
+_Become a Premium member today through the in-app settings!_
 
 ---
 
@@ -37,34 +37,29 @@ _Stay tuned for more updates!_
 <p align="center">
   <img src="assets/image1.png" width="800" alt="Library View">
   <br>
-  <em>Dashboard & Library Overview</em>
+  <em><b>Modern Library</b>: Organized and intuitive game collection management.</em>
 </p>
 
 <p align="center">
   <img src="assets/image2.png" width="800" alt="Details View">
   <br>
-  <em>FitGirl Repacks Manager</em>
+  <em><b>Rich Details</b>: All the information you need, directly from FitGirl and IGDB.</em>
 </p>
 
 <p align="center">
-  <img src="assets/image3.png" width="800" alt="Details View">
+  <img src="assets/image4.png" width="800" alt="Fullscreen Mode">
   <br>
-  <em>IGDB</em>
+  <em><b>Immersive Experience</b>: Clean fullscreen mode for browsing your collection.</em>
 </p>
 
-<p align="center">
-  <img src="assets/image4.png" width="800" alt="Details View">
-  <br>
-  <em>Fullscreen Mode</em>
-</p>
 ---
 
 ## 🚀 Getting Started
 
-1.  Go to the [**Releases**](https://github.com/ANOOBALSA/FitGirl-Repacks-Manager/releases) page.
+1.  Visit the [**Releases**](https://github.com/ANOOBALSA/FitGirl-Repacks-Manager/releases) page.
 2.  Download the latest `FitGirl Repacks Manager - v0.1.0.exe` installer.
 3.  Run the installer.
-4.  Launch the app.
+4.  Launch the app and start building your library!
 
 ---
 
@@ -78,6 +73,7 @@ This application is a management tool and does not host or distribute any copyri
 
 - Game Data powered by [IGDB](https://www.igdb.com/)
 - Repacks by [FitGirl](https://fitgirl-repacks.site/)
+- UI Framework: [Mantine](https://mantine.dev/)
 
 ---
 
