@@ -11,7 +11,6 @@ import {
   Card,
   Badge,
   Stack,
-  SimpleGrid,
   Loader,
   Center,
   Pagination,
@@ -23,8 +22,6 @@ import {
   ScrollArea,
   UnstyledButton,
   TextInput,
-  Divider,
-  Select,
   MultiSelect,
   Switch,
   SegmentedControl,
@@ -43,8 +40,6 @@ import {
   IconBookmark,
   IconDownload,
   IconSearch,
-  IconFilter,
-  IconCalendar,
 } from "@tabler/icons-react";
 import { Carousel } from "@mantine/carousel";
 import { GameDetails } from "../../components/GameDetails";
@@ -1323,7 +1318,6 @@ function RepacksPageContent() {
 }
 
 import { Suspense } from "react";
-import { json } from "stream/consumers";
 import { useAuth } from "../../components/providers/AuthProvider";
 
 export default function RepacksPage() {
