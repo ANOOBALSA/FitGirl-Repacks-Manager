@@ -40,7 +40,7 @@
 ## Getting Started
 
 1.  Visit the [**Releases**](https://github.com/ANOOBALSA/FitGirl-Repacks-Manager/releases) page.
-2.  Download the latest `FitGirl Repacks Manager - v0.1.0.exe` installer.
+2.  Download the latest `FitGirl Repacks Manager` installer.
 3.  Run the installer.
 4.  Launch the app and start building your library!
 

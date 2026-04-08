@@ -24,9 +24,9 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_PUBLIC_SUPABASE_TABLE_NAME: ${{secrets.NEXT_PUBLIC_SUPABASE_TABLE_NAME}}
-          NEXT_PUBLIC_IGDB_CLIENT_ID: ${{secrets.NEXT_PUBLIC_IGDB_CLIENT_ID}}
-          IGDB_CLIENT_SECRET: ${{secrets.IGDB_CLIENT_SECRET}}
+          NEXT_PUBLIC_SUPABASE_TABLE_NAME: ${{ secrets.NEXT_PUBLIC_SUPABASE_TABLE_NAME }}
+          NEXT_PUBLIC_IGDB_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_IGDB_CLIENT_ID }}
+          IGDB_CLIENT_SECRET: ${{ secrets.IGDB_CLIENT_SECRET }}
         with:
-          github_token: ${{ secrets.github_token }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           release: ${{ startsWith(github.ref, 'refs/tags/v') }}

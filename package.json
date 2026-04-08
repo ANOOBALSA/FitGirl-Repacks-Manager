@@ -1,5 +1,6 @@
 {
   "name": "fitgirl-repacks-manager",
+  "repository": "https://github.com/ANOOBALSA/FitGirl-Repacks-Manager.git",
   "productName": "FitGirl Repacks Manager",
   "displayName": "FitGirl Repacks Manager",
   "companyName": "Alsasoft",
@@ -14,10 +15,18 @@
     "dev": "concurrently \"next dev\" \"wait-on dist/index.js && wait-on tcp:3000 && electron .\"",
     "build": "next build && tsc -p tsconfig.main.json",
     "compile:main": "tsc -p tsconfig.main.json",
-    "build:exe": "npm run build && electron-builder"
+    "build:exe": "npm run build && electron-builder",
+    "release": "node scripts/release.js"
   },
   "build": {
     "appId": "com.fitgirl-repacks-manager.app",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "ANOOBALSA",
+        "repo": "FitGirl-Repacks-Manager"
+      }
+    ],
     "win": {
       "target": "nsis",
       "icon": "public/app_icon.png"
