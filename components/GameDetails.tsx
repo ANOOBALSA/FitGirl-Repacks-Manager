@@ -92,7 +92,6 @@ export function GameDetails({
   const [isUpdateOpen, setIsUpdateOpen] = useState<{ [key: string]: boolean }>(
     {},
   );
-
   const [repackLoading, setRepackLoading] = useState(false);
   const [rescrapeLoading, setRescrapeLoading] = useState(false);
   const [individualRescrapeLoading, setIndividualRescrapeLoading] = useState<
