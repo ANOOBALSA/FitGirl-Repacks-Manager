@@ -66,12 +66,6 @@ export function FileSelectionModal({
     return total;
   }, [mainFiles, selectedOptional, selectedSelective, partSizes]);
 
-  const mainFilesTotalSize = React.useMemo(() => {
-    let total = 0;
-    mainFiles.forEach((f) => (total += partSizes?.[f] || 0));
-    return total;
-  }, [mainFiles, partSizes]);
-
   const isLoadingSizes = React.useMemo(() => {
     const allSelected = [
       ...mainFiles,
