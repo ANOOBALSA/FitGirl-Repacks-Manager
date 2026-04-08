@@ -17,6 +17,7 @@ import {
   Loader,
   Center,
   useMantineTheme,
+  Menu,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useMediaQuery } from "@mantine/hooks";
@@ -37,6 +38,8 @@ import {
   IconUsers,
   IconStar,
   IconPinned,
+  IconChevronDown,
+  IconFileText,
 } from "@tabler/icons-react";
 import { Switch, ActionIcon, Tooltip, rem } from "@mantine/core";
 import { PlatformIcons } from "./PlatformIcons";
@@ -61,28 +64,8 @@ import {
 } from "@tabler/icons-react";
 import { ScrollArea } from "@mantine/core";
 import { MapViewer } from "./MapViewer";
-import fitgirlService from "../lib/fitgirl";
-
-interface FitGirlRepack {
-  PostTitle: string;
-  PostLink?: string;
-  PostFileRepackSize: string;
-  PostFileOriginalSize: string;
-  TorrentLinks: {
-    Source: string;
-    Magnet?: string;
-    ExternalLink?: string;
-  }[];
-  DirectLinks: {
-    Hoster: string;
-    Links: Record<string, string[] | undefined>;
-  }[];
-  Timestamp?: string;
-  PostID?: string;
-  Genres?: string[];
-  Companies?: string;
-  Languages?: string;
-}
+import fitgirlService, { FitGirlPost } from "../lib/fitgirl";
+import { motion, AnimatePresence } from "motion/react";
 
 interface GameDetailsProps {
   game: Game;
@@ -105,7 +88,11 @@ export function GameDetails({
   const theme = useMantineTheme();
   const isMobile = useMediaQuery(`(max-width: ${theme.breakpoints.sm})`);
   const isDesktop = useMediaQuery(`(min-width: ${theme.breakpoints.md})`);
-  const [repacks, setRepacks] = useState<FitGirlRepack[]>([]);
+  const [repacks, setRepacks] = useState<FitGirlPost[]>([]);
+  const [isUpdateOpen, setIsUpdateOpen] = useState<{ [key: string]: boolean }>(
+    {},
+  );
+
   const [repackLoading, setRepackLoading] = useState(false);
   const [rescrapeLoading, setRescrapeLoading] = useState(false);
   const [individualRescrapeLoading, setIndividualRescrapeLoading] = useState<
@@ -194,7 +181,7 @@ export function GameDetails({
   const [fileModalOpened, setFileModalOpened] = useState(false);
   const [optionsModalOpened, setOptionsModalOpened] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
-  const [selectedRepack, setSelectedRepack] = useState<FitGirlRepack | null>(
+  const [selectedRepack, setSelectedRepack] = useState<FitGirlPost | null>(
     null,
   );
   const [partSizes, setPartSizes] = useState<Record<string, number>>({});
@@ -272,7 +259,7 @@ export function GameDetails({
     });
   }, [downloadFolder, downloadProgress?.status]);
 
-  const handleDownloadClick = async (repack: FitGirlRepack) => {
+  const handleDownloadClick = async (repack: FitGirlPost) => {
     setSelectedRepack(repack);
     setOptionsModalOpened(true);
   };
@@ -289,7 +276,7 @@ export function GameDetails({
       const t = selectedRepack.TorrentLinks.find(
         (l: any) => l.Source === providerId,
       );
-      if (t) window.open(t.Magnet || t.ExternalLink);
+      if (t) (window as any).electron.openExternal(t.Magnet || t.ExternalLink);
       return;
     }
 
@@ -338,7 +325,7 @@ export function GameDetails({
         }
       } else {
         const links = d.Links.Main || Object.values(d.Links)[0];
-        if (links?.[0]) window.open(links[0]);
+        if (links?.[0]) (window as any).electron.openExternal(links[0]);
       }
     }
   };
@@ -1555,6 +1542,9 @@ export function GameDetails({
                             <Title order={3} size="h4" c="blue.4">
                               {repack.PostTitle}
                             </Title>
+                            {repack.Genres.includes("HYPERVISOR") && (
+                              <Badge color="red">HYPERVISOR</Badge>
+                            )}
                           </Group>
                           <Group gap="md">
                             <Text size="sm" c="dimmed">
@@ -1635,6 +1625,7 @@ export function GameDetails({
                               </Tooltip>
                             );
                           })()}
+
                           <Tooltip label="Refresh this repack">
                             <ActionIcon
                               variant="outline"
@@ -1659,7 +1650,11 @@ export function GameDetails({
                               size="lg"
                               radius="md"
                               disabled={!repack.PostLink}
-                              onClick={() => window.open(repack.PostLink)}
+                              onClick={() =>
+                                (window as any).electron.openExternal(
+                                  repack.PostLink,
+                                )
+                              }
                             >
                               <IconExternalLink size={18} />
                             </ActionIcon>
@@ -1689,7 +1684,9 @@ export function GameDetails({
                                 radius="md"
                                 leftSection={<IconDownload size={16} />}
                                 onClick={() =>
-                                  window.open(t.Magnet || t.ExternalLink)
+                                  (window as any).electron.openExternal(
+                                    t.Magnet || t.ExternalLink,
+                                  )
                                 }
                               >
                                 {t.Source}
@@ -1729,7 +1726,10 @@ export function GameDetails({
                                 onClick={() => {
                                   const links =
                                     d.Links.Main || Object.values(d.Links)[0];
-                                  if (links?.[0]) window.open(links[0]);
+                                  if (links?.[0])
+                                    (window as any).electron.openExternal(
+                                      links[0],
+                                    );
                                 }}
                                 style={{ justifyContent: "space-between" }}
                               >
@@ -1739,7 +1739,150 @@ export function GameDetails({
                           </SimpleGrid>
                         </Box>
                       </SimpleGrid>
+                      {/* Game Updates Dropdown */}
+                      {repack.GameUpdates && repack.GameUpdates.length > 0 && (
+                        <Box mt="xl">
+                          <motion.div
+                            initial={false}
+                            animate={
+                              isUpdateOpen[repack.PostID] ? "open" : "closed"
+                            }
+                          >
+                            <Button
+                              variant="light"
+                              color="blue"
+                              radius="md"
+                              fullWidth
+                              onClick={() =>
+                                setIsUpdateOpen((prev) => ({
+                                  ...prev,
+                                  [repack.PostID]: !prev[repack.PostID],
+                                }))
+                              }
+                              rightSection={
+                                <motion.div
+                                  animate={{
+                                    rotate: isUpdateOpen[repack.PostID]
+                                      ? 180
+                                      : 0,
+                                  }}
+                                  transition={{ duration: 0.2 }}
+                                  style={{ display: "inline-flex" }}
+                                >
+                                  <IconChevronDown size={18} />
+                                </motion.div>
+                              }
+                              styles={{
+                                root: {
+                                  backgroundColor: "rgba(24, 100, 171, 0.1)",
+                                  border: "1px solid rgba(24, 100, 171, 0.2)",
+                                  justifyContent: "space-between",
+                                },
+                              }}
+                            >
+                              <Group gap="xs">
+                                <IconPackage size={18} />
+                                <Text fw={600}>Game Updates</Text>
+                                <Badge
+                                  size="sm"
+                                  radius="xl"
+                                  color="blue"
+                                  variant="filled"
+                                >
+                                  {repack.GameUpdates.length}
+                                </Badge>
+                              </Group>
+                            </Button>
+
+                            <AnimatePresence>
+                              {isUpdateOpen[repack.PostID] && (
+                                <motion.div
+                                  initial={{ opacity: 0, height: 0, y: -10 }}
+                                  animate={{ opacity: 1, height: "auto", y: 0 }}
+                                  exit={{ opacity: 0, height: 0, y: -10 }}
+                                  transition={{
+                                    duration: 0.3,
+                                    ease: "easeInOut",
+                                  }}
+                                  style={{ overflow: "hidden" }}
+                                >
+                                  <Stack gap="xs" mt="sm">
+                                    {repack.GameUpdates.map(
+                                      (update, updateIdx) => (
+                                        <motion.div
+                                          key={updateIdx}
+                                          initial={{ opacity: 0, x: -20 }}
+                                          animate={{ opacity: 1, x: 0 }}
+                                          transition={{
+                                            delay: updateIdx * 0.05,
+                                          }}
+                                        >
+                                          <Button
+                                            fullWidth
+                                            variant="subtle"
+                                            color="gray"
+                                            radius="md"
+                                            onClick={() =>
+                                              (
+                                                window as any
+                                              ).electron.openExternal(
+                                                update.Url,
+                                              )
+                                            }
+                                            leftSection={
+                                              <IconDownload size={16} />
+                                            }
+                                            rightSection={
+                                              <Text
+                                                size="xs"
+                                                c="dimmed"
+                                                fs="italic"
+                                              >
+                                                Update #{updateIdx + 1}
+                                              </Text>
+                                            }
+                                            styles={{
+                                              root: {
+                                                justifyContent: "space-between",
+                                                transition: "all 0.2s ease",
+                                                "&:hover": {
+                                                  backgroundColor:
+                                                    "rgba(24, 100, 171, 0.1)",
+                                                  transform: "translateX(4px)",
+                                                },
+                                              },
+                                            }}
+                                          >
+                                            <Group gap="sm">
+                                              <motion.div
+                                                whileHover={{ scale: 1.1 }}
+                                                transition={{
+                                                  type: "spring",
+                                                  stiffness: 400,
+                                                }}
+                                              >
+                                                <IconFileText
+                                                  size={14}
+                                                  color="var(--mantine-color-blue-5)"
+                                                />
+                                              </motion.div>
+                                              <Text size="sm" fw={500}>
+                                                {update.Title}
+                                              </Text>
+                                            </Group>
+                                          </Button>
+                                        </motion.div>
+                                      ),
+                                    )}
+                                  </Stack>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </motion.div>
+                        </Box>
+                      )}
                     </Box>
+
                     {(repack.Companies || repack.Languages) && (
                       <Box
                         px="xl"
@@ -1871,15 +2014,17 @@ export function GameDetails({
                   <Stack key={video.video_id} gap="xs">
                     <AspectRatio ratio={16 / 9}>
                       <iframe
-                        src={`https://www.youtube.com/embed/${video.video_id}`}
+                        src={`https://www.youtube.com/embed/${video.video_id}?rel=0`}
                         title={video.name}
                         style={{
                           border: 0,
                           borderRadius: "24px",
                           boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
                         }}
+                        name="google-disable-x-frame-options"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
+                        referrerPolicy="no-referrer-when-downgrade"
                       />
                     </AspectRatio>
                     <Text fw={600} size="sm" px="xs">

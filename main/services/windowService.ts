@@ -14,7 +14,6 @@ import { registerWindowHandlers } from "../handlers/window";
 import { registerMapGenieHandlers } from "../handlers/mapgenie";
 
 import trayService from "./trayService";
-import * as jumpListService from "./jumpListService";
 import { updateJumpList } from "./jumpListService";
 
 let mainWindow: BrowserWindow | null = null;
