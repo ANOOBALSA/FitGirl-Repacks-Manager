@@ -4,7 +4,7 @@
   "productName": "FitGirl Repacks Manager",
   "displayName": "FitGirl Repacks Manager",
   "companyName": "Alsasoft",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "FitGirl Repacks Manager",
   "author": "Alsasoft",
   "private": true,
@@ -12,9 +12,9 @@
   "scripts": {
     "start": "next start",
     "lint": "next lint",
-    "dev": "concurrently \"next dev\" \"tsc -p tsconfig.main.json && node scripts/inject-env.js && wait-on dist/index.js && wait-on tcp:3000 && electron .\"",
+    "dev": "concurrently \"next dev\" \"tsc -p tsconfig.main.json && node public-scripts/inject-env.js && wait-on dist/index.js && wait-on tcp:3000 && electron .\"",
     "build": "next build && tsc -p tsconfig.main.json",
-    "build:main": "next build && tsc -p tsconfig.main.json && node scripts/inject-env.js",
+    "build:main": "next build && tsc -p tsconfig.main.json && node public-scripts/inject-env.js",
     "build:exe": "npm run build:main && electron-builder",
     "release": "node scripts/release.js"
   },
