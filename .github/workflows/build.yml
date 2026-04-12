@@ -30,7 +30,7 @@ jobs:
 
       - name: build-win
         if: matrix.os == 'windows-latest'
-        run: npm run build:exe
+        run: npm run build:git
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
