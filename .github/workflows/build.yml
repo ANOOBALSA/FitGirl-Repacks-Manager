@@ -18,10 +18,10 @@ jobs:
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Install Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: 24
 
@@ -41,14 +41,14 @@ jobs:
           NEXT_PUBLIC_SUPABASE_TABLE_NAME: ${{ secrets.NEXT_PUBLIC_SUPABASE_TABLE_NAME }}
           NEXT_PUBLIC_IGDB_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_IGDB_CLIENT_ID }}
           IGDB_CLIENT_SECRET: ${{ secrets.IGDB_CLIENT_SECRET }}
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@v2
         with:
           draft: true
-          token: ${{ secrets.ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             release/*.exe
             release/*.zip
