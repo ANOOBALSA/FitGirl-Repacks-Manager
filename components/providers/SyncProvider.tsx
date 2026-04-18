@@ -77,6 +77,7 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
         user: user.id,
         userGames: localData.userGames || {},
         statusTimestamps: localData.statusTimestamps || {},
+        readRepacks: localData.readRepacks || [],
         repackIgdbMapping: localData.repackIgdbMapping || {},
         virtualGames: localData.virtualGames || {},
         gamePaths: localData.gamePaths || {},
