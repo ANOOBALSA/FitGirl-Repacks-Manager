@@ -12,7 +12,7 @@
   "scripts": {
     "start": "next start",
     "lint": "next lint",
-    "dev": "concurrently \"next dev\" \"tsc -p tsconfig.main.json && node public-scripts/inject-env.js && wait-on dist/index.js && wait-on tcp:3000 && electron .\"",
+    "dev": "concurrently \"next dev\" \"tsc -p tsconfig.main.json && node scripts/inject-env.js && wait-on dist/index.js && wait-on tcp:3000 && electron .\"",
     "build": "next build && tsc -p tsconfig.main.json",
     "build:main": "next build && tsc -p tsconfig.main.json && node scripts/inject-env.js",
     "build:exe": "npm run build:main && electron-builder",

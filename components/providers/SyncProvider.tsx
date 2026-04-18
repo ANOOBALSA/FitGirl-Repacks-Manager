@@ -51,7 +51,6 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
               repackIgdbMapping: data.repackIgdbMapping || {},
               virtualGames: data.virtualGames || {},
               gamePaths: data.gamePaths || {},
-              ds4Path: data.ds4Path || "",
               gameDs4Settings: data.gameDs4Settings || {},
               playTime: data.playTime || {},
               lastPlayedTimestamps: data.lastPlayedTimestamps || {},
@@ -110,6 +109,20 @@ export function SyncProvider({ children }: { children: React.ReactNode }) {
       setLastSynced(new Date());
     } catch (error: any) {
       console.error("[Sync] Failed to sync data:", error);
+
+      // Log detailed validation errors if available
+      if (error.data && error.data.data) {
+        console.error(
+          "[Sync] Validation Errors:",
+          JSON.stringify(error.data.data, null, 2),
+        );
+      } else if (error.data) {
+        console.error(
+          "[Sync] Error Details:",
+          JSON.stringify(error.data, null, 2),
+        );
+      }
+
       notifications.show({
         title: "Sync Failed",
         message:

@@ -10,10 +10,13 @@ global.EventSource = EventSource;
 class NotificationService {
   private pb: PocketBase | null = null;
   private unsubscribe: (() => void) | null = null;
+  private isStarting = false;
 
   async start() {
-    if (this.unsubscribe) {
-      console.log("[NotificationService] Already subscribed, skipping start.");
+    if (this.isStarting || this.unsubscribe) {
+      console.log(
+        "[NotificationService] Already subscribed or subscription in progress, skipping start.",
+      );
       return;
     }
 
@@ -28,12 +31,12 @@ class NotificationService {
       return;
     }
 
+    this.isStarting = true;
     this.pb = new PocketBase(pbUrl);
 
     console.log(
       `[NotificationService] Subscribing to "${COLLECTION_NAME}" (Realtime enabled: ${!!this.pb})`,
     );
-    console.log(`[NotificationService] URL: ${pbUrl}`);
 
     try {
       this.unsubscribe = await this.pb
@@ -47,10 +50,6 @@ class NotificationService {
           );
 
           if (e.record && e.action === "create") {
-            console.log(
-              `[NotificationService] Processing ${e.action} for:`,
-              e.record.PostTitle,
-            );
             this.handleNewRepack(e.record, "INSERT");
           }
         });
@@ -61,6 +60,8 @@ class NotificationService {
         "[NotificationService] Failed to subscribe to Realtime:",
         err.message,
       );
+    } finally {
+      this.isStarting = false;
     }
   }
 
@@ -71,6 +72,7 @@ class NotificationService {
       this.unsubscribe = null;
     }
     this.pb = null;
+    this.isStarting = false;
   }
 
   private async handleNewRepack(repack: any, eventType: string = "INSERT") {
@@ -132,18 +134,29 @@ class NotificationService {
       });
 
       notification.on("click", () => {
+        console.log("[NotificationService] Notification clicked:", postTitle);
         const mainWindow = getMainWindow();
         if (mainWindow) {
-          if (mainWindow.isMinimized()) mainWindow.restore();
-          mainWindow.show();
+          if (mainWindow.isMinimized()) {
+            console.log("[NotificationService] Restoring minimized window");
+            mainWindow.restore();
+          }
+          if (!mainWindow.isVisible()) {
+            console.log("[NotificationService] Showing hidden window");
+            mainWindow.show();
+          }
           mainWindow.focus();
 
+          console.log("[NotificationService] Sending navigation event for:", repack.PostID);
           mainWindow.webContents.send("navigate-to-repack", repack);
+        } else {
+          console.error("[NotificationService] Cannot focus window: mainWindow is null");
         }
       });
 
       notification.show();
     }
+
 
     const mainWindow = getMainWindow();
     if (mainWindow) {

@@ -62,6 +62,10 @@ export function GameCard({
 
   useEffect(() => {
     const checkRepack = async () => {
+      if (!currentStatuses.includes("wishlist")) {
+        setHasRepack(false);
+        return;
+      }
       try {
         const result = await fitgirlService.searchForRepack(game.name);
         setHasRepack(Array.isArray(result) ? result.length > 0 : !!result);
@@ -70,7 +74,7 @@ export function GameCard({
       }
     };
     checkRepack();
-  }, [game.name]);
+  }, [game.name, currentStatuses]);
 
   const StatusIcon = ({
     status,

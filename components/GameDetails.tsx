@@ -948,13 +948,14 @@ export function GameDetails({
                   wrap="wrap"
                   gap="md"
                 >
-                  <Badge size="xl" color="blue" variant="filled">
+                  {/* <Badge size="xl" color="blue" variant="filled">
                     {safeStatuses.length > 0
                       ? safeStatuses
                           .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
                           .join(" ")
                       : "Not in Library"}
-                  </Badge>
+                  </Badge> */}
+                  <Box></Box>
 
                   <Group gap="sm">
                     <StatusButton

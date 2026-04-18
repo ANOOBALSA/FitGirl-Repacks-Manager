@@ -572,7 +572,16 @@ function RepacksPageContent() {
     return (
       <GameDetails
         game={selectedGame}
-        onBack={() => setSelectedGame(null)}
+        onBack={() => {
+          setSelectedGame(null);
+          // Clear repackId from URL if present
+          if (repackIdFromUrl) {
+            const params = new URLSearchParams(searchParams.toString());
+            params.delete("repackId");
+            const newUrl = `/repacks${params.toString() ? "?" + params.toString() : ""}`;
+            router.replace(newUrl);
+          }
+        }}
         onStatusChange={handleStatusChange}
         currentStatuses={userGames[selectedGame.id] || []}
       />

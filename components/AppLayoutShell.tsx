@@ -55,6 +55,7 @@ export function AppLayoutShell({ children }: { children: React.ReactNode }) {
   const handleClose = () => (window as any).electron?.close();
 
   const [bigPictureMode, setBigPictureMode] = React.useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(true);
 
   const [activeDownloads, setActiveDownloads] = React.useState<
     Record<string, any>
@@ -75,7 +76,8 @@ export function AppLayoutShell({ children }: { children: React.ReactNode }) {
       setHasUpdateAvailable(true);
     };
     window.addEventListener("fit:update-available", handleUpdate);
-    return () => window.removeEventListener("fit:update-available", handleUpdate);
+    return () =>
+      window.removeEventListener("fit:update-available", handleUpdate);
   }, []);
 
   React.useEffect(() => {
@@ -83,7 +85,7 @@ export function AppLayoutShell({ children }: { children: React.ReactNode }) {
     const electron = (window as any).electron;
 
     electron.getActiveDownloads().then(setActiveDownloads);
-    
+
     // Trigger the startup update check
     if (electron.checkForUpdatesAndNotify) {
       electron.checkForUpdatesAndNotify();
@@ -214,7 +216,7 @@ export function AppLayoutShell({ children }: { children: React.ReactNode }) {
     <AppShell
       header={{ height: 60 }}
       navbar={{
-        width: 350,
+        width: sidebarCollapsed ? 80 : 350,
         breakpoint: "sm",
         collapsed: { mobile: !opened },
       }}
@@ -275,7 +277,11 @@ export function AppLayoutShell({ children }: { children: React.ReactNode }) {
                   color="blue"
                   radius="md"
                   size="lg"
-                  onClick={() => window.dispatchEvent(new CustomEvent("fit:open-update-modal"))}
+                  onClick={() =>
+                    window.dispatchEvent(
+                      new CustomEvent("fit:open-update-modal"),
+                    )
+                  }
                   title="Update Available"
                   className="animate-pulse"
                 >
@@ -523,10 +529,17 @@ export function AppLayoutShell({ children }: { children: React.ReactNode }) {
 
       <AppShell.Navbar
         p="0"
-        style={{ borderRight: "none", backgroundColor: "transparent" }}
+        style={{
+          borderRight: "none",
+          backgroundColor: "transparent",
+          transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+        }}
         withBorder={false}
       >
-        <LibrarySidebar />
+        <LibrarySidebar
+          isCollapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
       </AppShell.Navbar>
 
       <AppShell.Main bg="transparent">

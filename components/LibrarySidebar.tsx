@@ -6,7 +6,6 @@ import {
   Stack,
   Text,
   Box,
-  SegmentedControl,
   TextInput,
   ActionIcon,
   ScrollArea,
@@ -15,10 +14,10 @@ import {
   Center,
   NavLink,
   rem,
-  Divider,
-  Portal,
   Image,
   Badge,
+  Portal,
+  Tooltip,
 } from "@mantine/core";
 import {
   IconStar,
@@ -31,12 +30,11 @@ import {
   IconSortDescending,
   IconCompass,
   IconTrophy,
-  IconLoader2,
-  IconPlayerPause,
-  IconPlayerPlay,
-  IconPlayerPlayFilled,
-  IconTrash,
   IconRefresh,
+  IconLibrary,
+  IconChevronLeft,
+  IconChevronRight,
+  IconPlayerPlayFilled,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -46,7 +44,15 @@ import { useOnlineStatus } from "../lib/useOnlineStatus";
 
 type SortMode = "release_date" | "name" | "date_added" | "last_played";
 
-export function LibrarySidebar() {
+interface LibrarySidebarProps {
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
+}
+
+export function LibrarySidebar({
+  isCollapsed,
+  onToggleCollapse,
+}: LibrarySidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -256,7 +262,7 @@ export function LibrarySidebar() {
         )}
       </Portal>
       <Box
-        w={350}
+        w={isCollapsed ? 80 : 350}
         style={{
           borderRight: "1px solid rgba(255, 255, 255, 0.05)",
           display: "flex",
@@ -266,6 +272,8 @@ export function LibrarySidebar() {
           WebkitBackdropFilter: "blur(16px)",
           height: "calc(100vh - 60px)",
           zIndex: 10,
+          transition: "width 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          overflow: "hidden",
         }}
       >
         <Box
@@ -275,39 +283,78 @@ export function LibrarySidebar() {
           <Stack gap={4}>
             <NavLink
               component={Link}
+              href="/library"
+              active={pathname === "/library"}
+              label={!isCollapsed && <Text size="sm">Library</Text>}
+              leftSection={<IconLibrary size={18} stroke={1.5} />}
+              variant="filled"
+              styles={{
+                root: {
+                  borderRadius: rem(6),
+                  padding: isCollapsed ? 0 : "8px 12px",
+                  justifyContent: isCollapsed ? "center" : "flex-start",
+                  height: isCollapsed ? 40 : undefined,
+                },
+                section: {
+                  margin: isCollapsed ? 0 : undefined,
+                  display: "flex",
+                  justifyContent: "center",
+                  width: isCollapsed ? "100%" : undefined,
+                },
+              }}
+            />
+            <NavLink
+              component={Link}
               href="/discover"
               active={
                 pathname === "/discover" ||
                 (pathname === "/" && !selectedGameId)
               }
               label={
-                <Group gap="xs">
-                  <Text size="sm">Discover</Text>
-                  {!isOnline && (
-                    <Badge size="xs" variant="outline" color="gray">
-                      Offline
-                    </Badge>
-                  )}
-                </Group>
+                !isCollapsed && (
+                  <Group gap="xs">
+                    <Text size="sm">Discover</Text>
+                    {!isOnline && (
+                      <Badge size="xs" variant="outline" color="gray">
+                        Offline
+                      </Badge>
+                    )}
+                  </Group>
+                )
               }
               disabled={!isOnline}
               leftSection={<IconCompass size={18} stroke={1.5} />}
               variant="filled"
-              styles={{ root: { borderRadius: rem(6), padding: "8px 12px" } }}
+              styles={{
+                root: {
+                  borderRadius: rem(6),
+                  padding: isCollapsed ? 0 : "8px 12px",
+                  justifyContent: isCollapsed ? "center" : "flex-start",
+                  height: isCollapsed ? 40 : undefined,
+                },
+                section: {
+                  margin: isCollapsed ? 0 : undefined,
+                  display: "flex",
+                  justifyContent: "center",
+                  width: isCollapsed ? "100%" : undefined,
+                },
+              }}
             />
             <NavLink
               component={Link}
               href="/repacks"
               active={pathname === "/repacks"}
               label={
-                <Group gap="xs">
-                  <Text size="sm">Repack Database</Text>
-                  {!isOnline && (
-                    <Badge size="xs" variant="outline" color="gray">
-                      Offline
-                    </Badge>
-                  )}
-                </Group>
+                !isCollapsed && (
+                  <Group gap="xs">
+                    <Text size="sm">Repack Database</Text>
+                    {!isOnline && (
+                      <Badge size="xs" variant="outline" color="gray">
+                        Offline
+                      </Badge>
+                    )}
+                  </Group>
+                )
               }
               leftSection={<IconTrophy size={18} stroke={1.5} />}
               variant="filled"
@@ -315,121 +362,161 @@ export function LibrarySidebar() {
               styles={{
                 root: {
                   borderRadius: rem(6),
-                  padding: "8px 12px",
+                  padding: isCollapsed ? 0 : "8px 12px",
                   opacity: isOnline ? 1 : 0.5,
                   cursor: isOnline ? "pointer" : "not-allowed",
+                  justifyContent: isCollapsed ? "center" : "flex-start",
+                  height: isCollapsed ? 40 : undefined,
+                },
+                section: {
+                  margin: isCollapsed ? 0 : undefined,
+                  display: "flex",
+                  justifyContent: "center",
+                  width: isCollapsed ? "100%" : undefined,
                 },
               }}
             />
           </Stack>
         </Box>
 
-        <Box
-          p="md"
-          style={{
-            borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
-            position: "relative",
-          }}
-        >
-          <Text
-            size="xs"
-            fw={700}
-            c="dimmed"
-            mb="xs"
-            style={{ textTransform: "uppercase", letterSpacing: 1 }}
+        {!isCollapsed ? (
+          <Box
+            p="md"
+            style={{
+              borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+              position: "relative",
+            }}
           >
-            My Library
-          </Text>
-          <Stack gap="xs">
-            <Group wrap="nowrap" gap="xs">
-              <TextInput
-                placeholder="Search library..."
-                leftSection={<IconSearch size={14} />}
+            <Group justify="space-between" align="center" mb="xs">
+              <Text
                 size="xs"
-                radius="md"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.currentTarget.value)}
-                style={{ flex: 1 }}
-              />
-              <ActionIcon
-                variant="light"
-                color="blue"
-                size="30px"
-                radius="md"
-                onClick={async () => {
-                  setLoading(true);
-                  await reload();
-                  setLoading(false);
-                }}
-                disabled={loading}
-                title="Refresh Library"
-                style={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}
+                fw={700}
+                c="dimmed"
+                style={{ textTransform: "uppercase", letterSpacing: 1 }}
               >
-                <IconRefresh size={16} className={loading ? "rotating" : ""} />
-              </ActionIcon>
-            </Group>
-            <Group wrap="nowrap" gap="xs">
-              <Select
-                size="xs"
-                radius="md"
-                value={sortMode}
-                onChange={(val) => setSortMode(val as SortMode)}
-                data={[
-                  { label: "Last Played", value: "last_played" },
-                  { label: "Name", value: "name" },
-                  { label: "Date Added", value: "date_added" },
-                  { label: "Release Date", value: "release_date" },
-                ]}
-                style={{ flex: 1 }}
-                styles={{
-                  input: {
-                    backgroundColor: "rgba(255, 255, 255, 0.05)",
-                    border: "none",
-                  },
-                }}
-              />
+                My Library
+              </Text>
               <ActionIcon
-                variant="light"
+                variant="subtle"
                 color="gray"
-                size="30px"
-                radius="md"
-                onClick={() =>
-                  setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-                }
-                style={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}
+                size="xs"
+                onClick={onToggleCollapse}
               >
-                {sortOrder === "asc" ? (
-                  <IconSortAscending size={16} />
-                ) : (
-                  <IconSortDescending size={16} />
-                )}
+                <IconChevronLeft size={14} />
               </ActionIcon>
             </Group>
-            <Group gap={4} wrap="wrap">
-              {[
-                { value: "playing", icon: IconDeviceGamepad2, color: "blue" },
-                { value: "favorite", icon: IconStar, color: "red" },
-                { value: "wishlist", icon: IconBookmark, color: "orange" },
-                { value: "completed", icon: IconCheck, color: "green" },
-                { value: "downloaded", icon: IconDownload, color: "cyan" },
-              ].map((t) => {
-                const isActive = activeTags.includes(t.value);
-                return (
-                  <ActionIcon
-                    key={t.value}
-                    variant={isActive ? "filled" : "light"}
-                    color={isActive ? t.color : "gray"}
-                    onClick={() => handleTagToggle(t.value)}
-                    size="sm"
-                    radius="md"
-                  >
-                    <t.icon size={14} />
-                  </ActionIcon>
-                );
-              })}
-            </Group>
-          </Stack>
-        </Box>
+            <Stack gap="xs">
+              <Group wrap="nowrap" gap="xs">
+                <TextInput
+                  placeholder="Search library..."
+                  leftSection={<IconSearch size={14} />}
+                  size="xs"
+                  radius="md"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.currentTarget.value)}
+                  style={{ flex: 1 }}
+                />
+                <ActionIcon
+                  variant="light"
+                  color="blue"
+                  size="30px"
+                  radius="md"
+                  onClick={async () => {
+                    setLoading(true);
+                    await reload();
+                    setLoading(false);
+                  }}
+                  disabled={loading}
+                  title="Refresh Library"
+                  style={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}
+                >
+                  <IconRefresh
+                    size={16}
+                    className={loading ? "rotating" : ""}
+                  />
+                </ActionIcon>
+              </Group>
+              <Group wrap="nowrap" gap="xs">
+                <Select
+                  size="xs"
+                  radius="md"
+                  value={sortMode}
+                  onChange={(val) => setSortMode(val as SortMode)}
+                  data={[
+                    { label: "Last Played", value: "last_played" },
+                    { label: "Name", value: "name" },
+                    { label: "Date Added", value: "date_added" },
+                    { label: "Release Date", value: "release_date" },
+                  ]}
+                  style={{ flex: 1 }}
+                  styles={{
+                    input: {
+                      backgroundColor: "rgba(255, 255, 255, 0.05)",
+                      border: "none",
+                    },
+                  }}
+                />
+                <ActionIcon
+                  variant="light"
+                  color="gray"
+                  size="30px"
+                  radius="md"
+                  onClick={() =>
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                  }
+                  style={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}
+                >
+                  {sortOrder === "asc" ? (
+                    <IconSortAscending size={16} />
+                  ) : (
+                    <IconSortDescending size={16} />
+                  )}
+                </ActionIcon>
+              </Group>
+              <Group gap={4} wrap="wrap">
+                {[
+                  { value: "playing", icon: IconDeviceGamepad2, color: "blue" },
+                  { value: "favorite", icon: IconStar, color: "red" },
+                  { value: "wishlist", icon: IconBookmark, color: "orange" },
+                  { value: "completed", icon: IconCheck, color: "green" },
+                  { value: "downloaded", icon: IconDownload, color: "cyan" },
+                ].map((t) => {
+                  const isActive = activeTags.includes(t.value);
+                  return (
+                    <ActionIcon
+                      key={t.value}
+                      variant={isActive ? "filled" : "light"}
+                      color={isActive ? t.color : "gray"}
+                      onClick={() => handleTagToggle(t.value)}
+                      size="sm"
+                      radius="md"
+                    >
+                      <t.icon size={14} />
+                    </ActionIcon>
+                  );
+                })}
+              </Group>
+            </Stack>
+          </Box>
+        ) : (
+          <Box
+            py="md"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+            }}
+          >
+            <ActionIcon
+              variant="light"
+              color="gray"
+              size="md"
+              onClick={onToggleCollapse}
+            >
+              <IconChevronRight size={18} />
+            </ActionIcon>
+          </Box>
+        )}
 
         <ScrollArea flex={1} p="xs">
           {loading ? (
@@ -437,13 +524,53 @@ export function LibrarySidebar() {
               <Loader size="sm" />
             </Center>
           ) : allItems.length === 0 ? (
-            <Text size="xs" c="dimmed" ta="center" mt="xl">
-              No games found
-            </Text>
+            !isCollapsed && (
+              <Text size="xs" c="dimmed" ta="center" mt="xl">
+                No games found
+              </Text>
+            )
           ) : (
-            <Stack gap={4}>
+            <Stack gap={4} align={isCollapsed ? "center" : "stretch"}>
               {allItems.map((game) => {
                 const isSelected = selectedGameId === game.id;
+                if (isCollapsed) {
+                  return (
+                    <Tooltip key={game.id} label={game.name} position="right">
+                      <Box
+                        onClick={() => handleCardClick(game.id)}
+                        style={{
+                          cursor: "pointer",
+                          borderRadius: "8px",
+                          overflow: "hidden",
+                          width: "40px",
+                          height: "50px",
+                          flexShrink: 0,
+                          backgroundColor: isSelected
+                            ? "var(--mantine-color-blue-filled)"
+                            : "#2C2E33",
+                          border: isSelected ? "none" : "1px solid transparent",
+                          transition: "all 0.2s ease",
+                        }}
+                      >
+                        <Image
+                          src={
+                            game.cover?.url?.replace(
+                              "t_thumb",
+                              "t_cover_small",
+                            ) || ""
+                          }
+                          alt={game.name}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            opacity: isSelected ? 1 : 0.7,
+                          }}
+                        />
+                      </Box>
+                    </Tooltip>
+                  );
+                }
                 return (
                   <Box
                     key={game.id}
@@ -528,6 +655,7 @@ export function LibrarySidebar() {
                           radius="md"
                           onClick={(e) => {
                             e.stopPropagation();
+                            handleCardClick(game.id);
                             window.electron.launchGame(gamePaths[game.id]);
                           }}
                           style={{ flexShrink: 0 }}
