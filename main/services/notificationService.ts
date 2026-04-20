@@ -50,8 +50,6 @@ class NotificationService {
           );
 
           if (e.record && e.action === "create") {
-            // When a new post is published, remove it from the local
-            // readRepacks list so it shows up as unread for all users.
             this.purgeFromReadRepacks(e.record.id);
             this.handleNewRepack(e.record, "INSERT");
           }
