@@ -15,7 +15,7 @@ import {
   Center,
 } from "@mantine/core";
 import React, { useState, useEffect } from "react";
-import BorderGlow from "./BorderGlow";
+import BorderGlow from "./border-glow";
 import {
   IconHeart,
   IconCheck,

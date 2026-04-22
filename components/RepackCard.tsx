@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, memo, useMemo, useRef, useEffect } from "react";
-import BorderGlow from "./BorderGlow";
+import BorderGlow from "./border-glow";
 import {
   Card,
   Image,

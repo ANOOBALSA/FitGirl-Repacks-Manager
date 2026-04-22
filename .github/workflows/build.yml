@@ -11,7 +11,6 @@ on:
       - main
   workflow_dispatch:
 
-
 jobs:
   release:
     runs-on: ${{ matrix.os }}
@@ -42,11 +41,6 @@ jobs:
           node -e "const fs = require('fs'); const files = ['dist/index.js', 'dist/main/index.js']; const keys = ['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_ANON_KEY', 'NEXT_PUBLIC_SUPABASE_TABLE_NAME', 'NEXT_PUBLIC_IGDB_CLIENT_ID', 'IGDB_CLIENT_SECRET']; files.forEach(f => { if (fs.existsSync(f)) { let content = fs.readFileSync(f, 'utf8'); keys.forEach(k => { const v = process.env[k]; if (v) { content = content.replace(new RegExp('process\\.env\\.' + k, 'g'), '\"' + v.replace(/\"/g, '\\\\\"') + '\"'); console.log('Injected ' + k + ' into ' + f); } }); fs.writeFileSync(f, content, 'utf8'); } });"
           npx electron-builder
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_PUBLIC_SUPABASE_TABLE_NAME: ${{ secrets.NEXT_PUBLIC_SUPABASE_TABLE_NAME }}
-          NEXT_PUBLIC_IGDB_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_IGDB_CLIENT_ID }}
-          IGDB_CLIENT_SECRET: ${{ secrets.IGDB_CLIENT_SECRET }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -71,4 +65,3 @@ jobs:
             release/*.zip
             release/*.yml
             release/*.blockmap
-
