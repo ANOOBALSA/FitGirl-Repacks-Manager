@@ -138,7 +138,7 @@ export default function RootPage() {
           <GameDetails
             game={selectedGame}
             onBack={() => {
-              if (fromParam === "discover") {
+              if (fromParam === "discover" || fromParam === "library") {
                 router.back();
               } else {
                 router.push("/");
@@ -146,7 +146,7 @@ export default function RootPage() {
             }}
             onStatusChange={handleStatusChange}
             currentStatuses={userGames[selectedGame.id] || []}
-            isEmbedded={fromParam !== "discover"}
+            isEmbedded={fromParam !== "discover" && fromParam !== "library"}
           />
         </Box>
       ) : (

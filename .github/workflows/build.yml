@@ -50,6 +50,3 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             release/*.exe
-            release/*.zip
-            release/*.yml
-            release/*.blockmap

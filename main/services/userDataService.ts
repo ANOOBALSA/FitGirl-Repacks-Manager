@@ -25,6 +25,8 @@ export interface UserData {
   lastPlayedTimestamps: Record<string, number>;
   activeDownloads: Record<string, any>;
   downloadedGames: Record<string, any>;
+  /** Persistent IGDB metadata cache so the library loads offline */
+  igdbCache: Record<string, any>;
   settings: UserSettings;
   migrationVersion: number;
   /** ISO timestamp of the last time the app was connected to PocketBase */
@@ -76,6 +78,7 @@ class UserDataService {
       lastPlayedTimestamps: {},
       activeDownloads: {},
       downloadedGames: {},
+      igdbCache: {},
       lastConnectedAt: new Date(0).toISOString(), // epoch → forces full catch-up on first run
       settings: {
         downloadDirectory: path.join(

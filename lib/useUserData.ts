@@ -12,6 +12,7 @@ export interface UserData {
   playTime: Record<number, number>;
   lastPlayedTimestamps: Record<number, number>;
   downloadedGames?: Record<number, string>;
+  igdbCache?: Record<number, Game>;
   settings: UserSettings;
   migrationVersion: number;
 }
