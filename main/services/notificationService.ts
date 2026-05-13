@@ -52,16 +52,13 @@ class NotificationService {
             COLLECTION_NAME,
           );
 
-          if (e.record && (e.action === "create" || e.action === "update")) {
+          if (e.record && e.action === "create") {
             const isDev = !app.isPackaged;
             const postTitle = e.record.PostTitle || "";
             if (postTitle.includes("Test Repack") && !isDev) return;
 
             this.purgeFromReadRepacks(e.record.id);
-            this.handleNewRepack(
-              e.record,
-              e.action === "create" ? "INSERT" : "UPDATE",
-            );
+            this.handleNewRepack(e.record, "INSERT");
           }
         });
 
