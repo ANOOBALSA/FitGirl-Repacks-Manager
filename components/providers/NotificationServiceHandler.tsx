@@ -347,31 +347,15 @@ export function NotificationServiceHandler() {
                 </Stack>
               )}
 
-              {updateStatus.installerPath && (
-                <Button
-                  color="green"
-                  radius="md"
-                  size="md"
-                  fullWidth
-                  leftSection={<IconRefresh size={18} />}
-                  onClick={() => {
-                    if (updateStatus.installerPath) {
-                      (window as any).electron.installUpdate(
-                        updateStatus.installerPath,
-                      );
-                    }
-                  }}
-                >
-                  Install & Relaunch
-                </Button>
-              )}
+
 
               {!updateStatus.downloading && !updateStatus.installerPath && (
                 <Button
                   color="blue"
                   radius="md"
                   size="md"
-                  rightSection={<IconArrowRight size={18} />}
+                  fullWidth
+                  leftSection={<IconRefresh size={18} />}
                   onClick={async () => {
                     if (!updateData?.release) return;
                     setUpdateStatus((prev) => ({
@@ -398,6 +382,11 @@ export function NotificationServiceHandler() {
                         downloading: false,
                         installerPath,
                       }));
+
+                      // Automatically trigger installation after download
+                      if (installerPath) {
+                        (window as any).electron.installUpdate(installerPath);
+                      }
                     } catch (err: any) {
                       console.error("Update download failed:", err);
                       setUpdateStatus((prev) => ({
@@ -410,7 +399,7 @@ export function NotificationServiceHandler() {
                     }
                   }}
                 >
-                  Update Now
+                  Download & Install
                 </Button>
               )}
             </Group>

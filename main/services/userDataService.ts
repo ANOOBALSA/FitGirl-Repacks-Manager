@@ -63,6 +63,22 @@ class UserDataService {
       await fs.ensureDir(path.dirname(this.dataPath));
       await this.saveData();
     }
+
+    this.syncStartupSettings();
+  }
+
+  syncStartupSettings(): void {
+    if (!this.data) return;
+    const { runOnStartup } = this.data.settings;
+    console.log(`[Main] Syncing startup setting: ${runOnStartup}`);
+    try {
+      app.setLoginItemSettings({
+        openAtLogin: runOnStartup,
+        path: process.execPath,
+      });
+    } catch (e) {
+      console.error("Failed to set login item settings:", e);
+    }
   }
 
   getDefaultData(): UserData {

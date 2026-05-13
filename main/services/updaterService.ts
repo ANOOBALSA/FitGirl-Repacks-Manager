@@ -247,29 +247,35 @@ export function getDownloadedInstallerPath(): string | null {
 export function launchInstaller(installerPath: string): void {
   console.log(`[Updater] Launching installer: ${installerPath}`);
 
-  // Use shell.openPath for more reliable Windows .exe launching
-  shell.openPath(installerPath).then((error) => {
-    if (error) {
-      console.error("[Updater] shell.openPath failed:", error);
-      // Fallback to spawn if openPath fails
-      const { spawn } = require("child_process");
-      try {
-        const child = spawn(installerPath, [], {
-          detached: true,
-          stdio: "ignore",
-          shell: true,
-        });
-        child.unref();
-      } catch (spawnErr) {
-        console.error("[Updater] Fallback spawn also failed:", spawnErr);
-      }
-    }
+  const { spawn } = require("child_process");
+  try {
+    const child = spawn(installerPath, [], {
+      detached: true,
+      stdio: "ignore",
+      shell: true,
+    });
+    child.unref();
+
+    console.log("[Updater] Installer launched via spawn. Quitting in 1s...");
 
     // Ensure app.quit() is not blocked by "close to tray" logic
     (app as any).isQuitting = true;
-    console.log("[Updater] Quitting app to allow installation...");
-    app.quit();
-  });
+
+    // Give it a second to ensure the process is handed off to the OS
+    setTimeout(() => {
+      app.quit();
+    }, 1000);
+  } catch (err) {
+    console.error("[Updater] Failed to launch installer via spawn:", err);
+    // Fallback to shell.openPath if spawn fails
+    shell.openPath(installerPath).then((openError) => {
+      if (openError) {
+        console.error("[Updater] Fallback shell.openPath also failed:", openError);
+      }
+      (app as any).isQuitting = true;
+      app.quit();
+    });
+  }
 }
 
 /**

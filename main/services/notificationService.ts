@@ -11,8 +11,11 @@ class NotificationService {
   private pb: PocketBase | null = null;
   private unsubscribe: (() => void) | null = null;
   private isStarting = false;
+  private appStartTime: Date = new Date();
+  private heartbeatTimer: NodeJS.Timeout | null = null;
 
   async start() {
+    this.appStartTime = new Date();
     if (this.isStarting || this.unsubscribe) {
       console.log(
         "[NotificationService] Already subscribed or subscription in progress, skipping start.",
@@ -49,9 +52,16 @@ class NotificationService {
             COLLECTION_NAME,
           );
 
-          if (e.record && e.action === "create") {
+          if (e.record && (e.action === "create" || e.action === "update")) {
+            const isDev = !app.isPackaged;
+            const postTitle = e.record.PostTitle || "";
+            if (postTitle.includes("Test Repack") && !isDev) return;
+
             this.purgeFromReadRepacks(e.record.id);
-            this.handleNewRepack(e.record, "INSERT");
+            this.handleNewRepack(
+              e.record,
+              e.action === "create" ? "INSERT" : "UPDATE",
+            );
           }
         });
 
@@ -59,6 +69,11 @@ class NotificationService {
 
       // Catch-up: purge any posts that were added while the app was offline
       await this.catchUpMissedNewRepacks();
+      // Start heartbeat to keep lastConnectedAt fresh
+      this.heartbeatTimer = setInterval(() => {
+        userDataService.setData("lastConnectedAt", new Date().toISOString());
+      }, 1000 * 60 * 5); // every 5 minutes
+
     } catch (err: any) {
       console.error(
         "[NotificationService] Failed to subscribe to Realtime:",
@@ -70,6 +85,18 @@ class NotificationService {
   }
 
   async stop() {
+    if (this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer);
+      this.heartbeatTimer = null;
+    }
+
+    // Final update before closing
+    try {
+      await userDataService.setData("lastConnectedAt", new Date().toISOString());
+    } catch (e) {
+      console.error("[NotificationService] Failed to update lastConnectedAt on stop:", e);
+    }
+
     if (this.unsubscribe) {
       console.log("[NotificationService] Unsubscribing from Realtime...");
       this.unsubscribe();
@@ -88,6 +115,17 @@ class NotificationService {
         "[NotificationService] Notifications disabled in settings, skipping.",
       );
       return;
+    }
+
+    // Ignore notifications for old events (e.g. from catch-up or replay)
+    if (repack.Timestamp) {
+      const repackTime = new Date(repack.Timestamp);
+      if (repackTime < this.appStartTime) {
+        console.log(
+          `[NotificationService] Skipping notification for old repack: "${repack.PostTitle}" (Timestamp: ${repack.Timestamp})`,
+        );
+        return;
+      }
     }
 
     console.log(
@@ -118,13 +156,13 @@ class NotificationService {
         `[NotificationService] Match found in library for "${repack.PostTitle}"!`,
       );
     }
-    if (!repack.PostTitle) return;
-
-    const postTitle = repack.PostTitle || "New Repack Added!";
-
-    // In dev mode, we want to allow Test Repack notifications for testing
+    const postTitle = repack.PostTitle || "";
     const isDev = !app.isPackaged;
-    if (!isDev && postTitle === "Test Repack") return;
+    if (postTitle.includes("Test Repack") && !isDev) {
+      console.log("[NotificationService] Suppressing Test Repack notification in production.");
+      return;
+    }
+
     if (!postTitle) return;
 
     if (Notification.isSupported()) {

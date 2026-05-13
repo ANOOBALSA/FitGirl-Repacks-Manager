@@ -6,6 +6,7 @@ import serve from "electron-serve";
 import { createWindow, getMainWindow } from "./services/windowService";
 import { notificationService } from "./services/notificationService";
 import { registerAuthHandlers } from "./handlers/auth";
+import userData from "./services/userDataService";
 
 const APP_ID = "com.fitgirl-repacks-manager.app";
 const APP_NAME = "FitGirl Repacks Manager";
@@ -110,6 +111,7 @@ process.on("unhandledRejection", (reason, promise) => {
 app.on("ready", () => {
   createWindow();
   registerAuthHandlers();
+  userData.ensureDataLoaded();
 
   if (!app.isPackaged || process.argv.length > 1) {
     const url = process.argv.find((arg) =>

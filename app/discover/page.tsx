@@ -23,7 +23,7 @@ import {
   IconDeviceGamepad2,
 } from "@tabler/icons-react";
 import { GameCard } from "../../components/GameCard";
-import { IgdbService, Game } from "../../lib/igdb";
+import { IgdbService, Game, IGDB_GENRES, IGDB_THEMES } from "../../lib/igdb";
 import { useUserData } from "../../lib/useUserData";
 import { Suspense } from "react";
 
@@ -35,6 +35,11 @@ function DiscoverPageContent() {
 
   const search = searchParams.get("search") || "";
   const filter = searchParams.get("filter") || "top_all";
+  const mode = searchParams.get("mode") || "all";
+  const genre = searchParams.get("genre") || "all";
+  const theme = searchParams.get("theme") || "all";
+  const fromYear = searchParams.get("fromYear") || "";
+  const toYear = searchParams.get("toYear") || "";
   const pageParam = searchParams.get("page");
   const page = pageParam ? Number(pageParam) : 1;
 
@@ -82,10 +87,21 @@ function DiscoverPageContent() {
           result = await IgdbService.getGames("search", search, page, LIMIT);
           totalCount = await IgdbService.getCount("search", search);
         } else {
-          const params =
-            filter === "top_year" ? new Date().getFullYear() : undefined;
-          result = await IgdbService.getGames(filter, params, page, LIMIT);
-          totalCount = await IgdbService.getCount(filter, params);
+          const discoveryParams = {
+            filter,
+            mode,
+            genre,
+            theme,
+            fromYear,
+            toYear,
+          };
+          result = await IgdbService.getGames(
+            "discover",
+            discoveryParams,
+            page,
+            LIMIT,
+          );
+          totalCount = await IgdbService.getCount("discover", discoveryParams);
         }
 
         setGames(result);
@@ -103,7 +119,17 @@ function DiscoverPageContent() {
     };
 
     fetchGames();
-  }, [filter, page, search, updateParams]);
+  }, [
+    filter,
+    mode,
+    genre,
+    theme,
+    fromYear,
+    toYear,
+    page,
+    search,
+    updateParams,
+  ]);
 
   const handleGameClick = (id: number) => {
     router.push(`/?gameId=${id}&from=discover`);
@@ -113,8 +139,16 @@ function DiscoverPageContent() {
     { value: "top_all", label: "Top All Time" },
     { value: "top_year", label: "Top of the Year" },
     { value: "top_month", label: "Top of the Month" },
+    { value: "most_rated", label: "Most Rated" },
     { value: "upcoming", label: "Upcoming Games" },
     { value: "new", label: "New Releases" },
+  ];
+
+  const modeOptions = [
+    { value: "all", label: "Any Mode" },
+    { value: "singleplayer", label: "Singleplayer" },
+    { value: "coop", label: "Co-operative" },
+    { value: "multiplayer", label: "Multiplayer" },
   ];
 
   return (
@@ -123,7 +157,6 @@ function DiscoverPageContent() {
         <Box pb={80}>
           <Group justify="space-between" mb="xl">
             <Group gap="xl">
-              <Title order={2}>Discover Games</Title>
               <TextInput
                 placeholder="Search all games..."
                 leftSection={<IconSearch size={16} />}
@@ -139,17 +172,88 @@ function DiscoverPageContent() {
                 }}
               />
             </Group>
-            <Select
-              data={discoverOptions}
-              value={filter}
-              onChange={(val) =>
-                updateParams({ filter: val || "top_all", page: "1" })
-              }
-              leftSection={<IconChevronDown size={16} />}
-              style={{ width: 220 }}
-              radius="md"
-              variant="filled"
-            />
+            <Group gap="xs">
+              <Select
+                data={[
+                  { value: "all", label: "All Genres" },
+                  ...IGDB_GENRES.map((g) => ({
+                    value: String(g.id),
+                    label: g.name,
+                  })),
+                ]}
+                value={genre}
+                onChange={(val) =>
+                  updateParams({ genre: val || "all", page: "1" })
+                }
+                placeholder="Genre"
+                style={{ width: 140 }}
+                radius="md"
+                variant="filled"
+                searchable
+              />
+              <Select
+                data={[
+                  { value: "all", label: "All Themes" },
+                  ...IGDB_THEMES.map((t) => ({
+                    value: String(t.id),
+                    label: t.name,
+                  })),
+                ]}
+                value={theme}
+                onChange={(val) =>
+                  updateParams({ theme: val || "all", page: "1" })
+                }
+                placeholder="Theme"
+                style={{ width: 140 }}
+                radius="md"
+                variant="filled"
+                searchable
+              />
+              <Select
+                data={modeOptions}
+                value={mode}
+                onChange={(val) =>
+                  updateParams({ mode: val || "all", page: "1" })
+                }
+                placeholder="Game Mode"
+                style={{ width: 140 }}
+                radius="md"
+                variant="filled"
+              />
+              <TextInput
+                placeholder="From Year"
+                type="number"
+                value={fromYear}
+                onChange={(e) =>
+                  updateParams({ fromYear: e.target.value || null, page: "1" })
+                }
+                style={{ width: 100 }}
+                radius="md"
+                variant="filled"
+              />
+              <TextInput
+                placeholder="To Year"
+                type="number"
+                value={toYear}
+                onChange={(e) =>
+                  updateParams({ toYear: e.target.value || null, page: "1" })
+                }
+                style={{ width: 100 }}
+                radius="md"
+                variant="filled"
+              />
+              <Select
+                data={discoverOptions}
+                value={filter}
+                onChange={(val) =>
+                  updateParams({ filter: val || "top_all", page: "1" })
+                }
+                leftSection={<IconChevronDown size={16} />}
+                style={{ width: 160 }}
+                radius="md"
+                variant="filled"
+              />
+            </Group>
           </Group>
 
           {loading ? (

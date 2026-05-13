@@ -47,7 +47,7 @@ export default function LibraryPage() {
   >("last_played");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [metadatas, setMetadatas] = useState<Record<number, Game>>({});
-  const [loadingMetas, setLoadingMetas] = useState(true);
+  const [loadingMetas, setLoadingMetas] = useState(false);
 
   const userGames = useMemo(
     () => userData?.userGames || {},
@@ -93,9 +93,10 @@ export default function LibraryPage() {
       const missingIds = allIds.filter((id) => id > 0 && !metadatas[id]);
 
       if (missingIds.length === 0) {
-        setLoadingMetas(false);
         return;
       }
+
+      setLoadingMetas(true);
 
       try {
         const results = await IgdbService.getGamesByIds(missingIds);
@@ -183,23 +184,10 @@ export default function LibraryPage() {
     await updateGameStatus(gameId, status, game);
   };
 
-  if (userDataLoading || loadingMetas) {
-    return (
-      <Center h="calc(100vh - 120px)">
-        <Stack align="center" gap="md">
-          <Loader size="xl" variant="bars" color="blue" />
-          <Text c="dimmed" fw={500}>
-            Loading your collection...
-          </Text>
-        </Stack>
-      </Center>
-    );
-  }
-
   return (
     <Box
       style={{
-        minHeight: "100vh",
+        height: "100vh",
         background:
           "linear-gradient(180deg, rgba(2,6,23,0) 0%, rgba(2,6,23,0.8) 100%)",
       }}
@@ -232,16 +220,21 @@ export default function LibraryPage() {
                   <IconLibrary size={36} color="white" />
                 </Box>
                 <Stack gap={4}>
-                  <Title
-                    order={1}
-                    style={{
-                      fontSize: rem(42),
-                      fontWeight: 800,
-                      letterSpacing: "-0.5px",
-                    }}
-                  >
-                    My Collection
-                  </Title>
+                  <Group gap="sm" align="center">
+                    <Title
+                      order={1}
+                      style={{
+                        fontSize: rem(42),
+                        fontWeight: 800,
+                        letterSpacing: "-0.5px",
+                      }}
+                    >
+                      My Collection
+                    </Title>
+                    {(userDataLoading || loadingMetas) && (
+                      <Loader size="sm" variant="dots" color="blue" />
+                    )}
+                  </Group>
                   <Text c="dimmed" size="lg" fw={500}>
                     {filteredGames.length}{" "}
                     {filteredGames.length === 1 ? "game" : "games"} in your

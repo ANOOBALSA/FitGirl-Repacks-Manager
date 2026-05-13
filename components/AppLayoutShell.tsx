@@ -28,10 +28,14 @@ import {
   IconWindowMinimize,
   IconArrowLeft,
   IconArrowRight,
+  IconPlus,
+  IconFilePlus,
+  IconSearch,
 } from "@tabler/icons-react";
 import { BigPictureView } from "./BigPictureView";
 import { LibrarySidebar } from "./LibrarySidebar";
 import { DetectGamesModal } from "./DetectGamesModal";
+import { ManualAddGameModal } from "./ManualAddGameModal";
 import { AuthModal } from "./auth/AuthModal";
 import { useAuth } from "./providers/AuthProvider";
 import { useSync } from "./providers/SyncProvider";
@@ -47,6 +51,8 @@ export function AppLayoutShell({ children }: { children: React.ReactNode }) {
   const [viewport, setViewport] = React.useState<HTMLDivElement | null>(null);
   const [content, setContent] = React.useState<HTMLDivElement | null>(null);
   const [detectModalOpened, { open: openDetect, close: closeDetect }] =
+    useDisclosure();
+  const [manualAddModalOpened, { open: openManual, close: closeManual }] =
     useDisclosure();
   const router = useRouter();
 
@@ -311,15 +317,35 @@ export function AppLayoutShell({ children }: { children: React.ReactNode }) {
             >
               <IconScreenShare size={20} />
             </ActionIcon>
-            <ActionIcon
-              onClick={openDetect}
-              variant="light"
-              color="blue"
-              radius="md"
-              size="lg"
-            >
-              <IconDeviceGamepad2 size={18} />
-            </ActionIcon>
+            <Menu shadow="md" width={200} position="bottom-end">
+              <Menu.Target>
+                <ActionIcon
+                  variant="light"
+                  color="blue"
+                  radius="md"
+                  size="lg"
+                  title="Add Game"
+                >
+                  <IconPlus size={20} />
+                </ActionIcon>
+              </Menu.Target>
+
+              <Menu.Dropdown>
+                <Menu.Label>Library Actions</Menu.Label>
+                <Menu.Item
+                  leftSection={<IconFilePlus size={16} />}
+                  onClick={openManual}
+                >
+                  Add Manually
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={<IconSearch size={16} />}
+                  onClick={openDetect}
+                >
+                  Scan for Games
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
             <Menu shadow="md" width={320} position="bottom-end">
               <Menu.Target>
                 <Box pos="relative">
@@ -554,6 +580,7 @@ export function AppLayoutShell({ children }: { children: React.ReactNode }) {
         </SmoothScrollProvider>
       </AppShell.Main>
       <DetectGamesModal opened={detectModalOpened} onClose={closeDetect} />
+      <ManualAddGameModal opened={manualAddModalOpened} onClose={closeManual} />
       {bigPictureMode && (
         <BigPictureView onClose={() => setBigPictureMode(false)} />
       )}
