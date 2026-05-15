@@ -70,6 +70,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, true);
   }, []);
 
+  // Heartbeat to keep "Online" status active in admin panel
+  useEffect(() => {
+    if (!user) return;
+
+    // Send initial heartbeat
+    const sendHeartbeat = async () => {
+      try {
+        await pb.collection("users").update(user.id, {});
+      } catch (error) {
+        // Silently fail, might be network issue or logged out
+      }
+    };
+
+    sendHeartbeat();
+
+    const interval = setInterval(sendHeartbeat, 5 * 60 * 1000); // 5 minutes
+    return () => clearInterval(interval);
+  }, [user?.id]);
+
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {

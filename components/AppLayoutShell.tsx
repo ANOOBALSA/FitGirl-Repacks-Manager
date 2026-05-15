@@ -43,6 +43,9 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { SmoothScrollProvider } from "./providers/SmoothScroll";
+import { FeedbackModal } from "./FeedbackModal";
+import { IconMessageHeart } from "@tabler/icons-react";
+
 
 export function AppLayoutShell({ children }: { children: React.ReactNode }) {
   const [opened, { toggle }] = useDisclosure();
@@ -52,7 +55,10 @@ export function AppLayoutShell({ children }: { children: React.ReactNode }) {
     useDisclosure();
   const [manualAddModalOpened, { open: openManual, close: closeManual }] =
     useDisclosure();
+  const [feedbackOpened, { open: openFeedback, close: closeFeedback }] =
+    useDisclosure();
   const router = useRouter();
+
 
   const handleMinimize = () => (window as any).electron?.minimize();
   const handleMaximize = () => (window as any).electron?.maximize();
@@ -205,6 +211,18 @@ export function AppLayoutShell({ children }: { children: React.ReactNode }) {
             >
               <IconSettings size={20} />
             </ActionIcon>
+
+            <ActionIcon
+              variant="light"
+              color="pink"
+              radius="md"
+              size="lg"
+              onClick={openFeedback}
+              title="Give Feedback"
+            >
+              <IconMessageHeart size={20} />
+            </ActionIcon>
+
 
             {hasUpdateAvailable && (
               <Box pos="relative" style={{ WebkitAppRegion: "no-drag" as any }}>
@@ -514,7 +532,9 @@ export function AppLayoutShell({ children }: { children: React.ReactNode }) {
       {bigPictureMode && (
         <BigPictureView onClose={() => setBigPictureMode(false)} />
       )}
+      <FeedbackModal opened={feedbackOpened} onClose={closeFeedback} />
     </AppShell>
+
   );
 }
 
