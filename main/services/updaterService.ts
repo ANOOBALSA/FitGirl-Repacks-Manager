@@ -248,33 +248,46 @@ export function launchInstaller(installerPath: string): void {
   console.log(`[Updater] Launching installer: ${installerPath}`);
 
   const { spawn } = require("child_process");
+
+  const quitApp = () => {
+    (app as any).isQuitting = true;
+    setTimeout(() => app.quit(), 1000);
+  };
+
+  const fallback = () => {
+    shell.openPath(installerPath).then((openError) => {
+      if (openError) {
+        console.error(
+          "[Updater] Fallback shell.openPath also failed:",
+          openError,
+        );
+      }
+      quitApp();
+    });
+  };
+
   try {
     const child = spawn(installerPath, [], {
       detached: true,
       stdio: "ignore",
-      shell: true,
     });
+
+    child.on("error", (err: any) => {
+      console.error("[Updater] Failed to launch installer via spawn:", err);
+      clearTimeout(timeout);
+      fallback();
+    });
+
+    // If no error within 500ms, assume success and quit
+    const timeout = setTimeout(() => {
+      console.log("[Updater] Installer launched via spawn. Quitting...");
+      quitApp();
+    }, 500);
+
     child.unref();
-
-    console.log("[Updater] Installer launched via spawn. Quitting in 1s...");
-
-    // Ensure app.quit() is not blocked by "close to tray" logic
-    (app as any).isQuitting = true;
-
-    // Give it a second to ensure the process is handed off to the OS
-    setTimeout(() => {
-      app.quit();
-    }, 1000);
   } catch (err) {
-    console.error("[Updater] Failed to launch installer via spawn:", err);
-    // Fallback to shell.openPath if spawn fails
-    shell.openPath(installerPath).then((openError) => {
-      if (openError) {
-        console.error("[Updater] Fallback shell.openPath also failed:", openError);
-      }
-      (app as any).isQuitting = true;
-      app.quit();
-    });
+    console.error("[Updater] Synchronous spawn error:", err);
+    fallback();
   }
 }
 

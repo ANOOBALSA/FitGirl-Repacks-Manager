@@ -116,6 +116,14 @@ function YouTubePlayer({ videoId }: { videoId: string }) {
   return <ReactPlayer src={url!} width="100%" height="100%" playing controls />;
 }
 
+const formatPlayTime = (minutes: number) => {
+  if (!minutes) return "0m";
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+};
+
 export function BigPictureView({ onClose }: BigPictureViewProps) {
   const { userData, loading: userDataLoading } = useUserData();
   const router = useRouter();
@@ -581,7 +589,7 @@ export function BigPictureView({ onClose }: BigPictureViewProps) {
           >
             <Carousel
               getEmblaApi={(api) => (carouselRef.current = api)}
-              slideSize="180px"
+              slideSize="140px"
               slideGap="xl"
               withControls={false}
               initialSlide={activeIndex}
@@ -597,37 +605,74 @@ export function BigPictureView({ onClose }: BigPictureViewProps) {
             >
               {games.slice(0, displayLimit).map((game, index) => (
                 <Carousel.Slide key={game.id}>
-                  <Box
-                    onClick={() => setActiveIndex(index)}
-                    style={{
-                      cursor: "pointer",
-                      transition:
-                        "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-                      transform:
-                        activeIndex === index
-                          ? "scale(1.4) translateY(-10px)"
-                          : "scale(1)",
-                      opacity: activeIndex === index ? 1 : 0.6,
-                      border:
-                        activeIndex === index
-                          ? "2px solid rgba(255,255,255,0.8)"
-                          : "2px solid transparent",
-                      borderRadius: "12px",
-                      overflow: "hidden",
-                      aspectRatio: "1/1",
-                      boxShadow:
-                        activeIndex === index
-                          ? "0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.2)"
-                          : "none",
-                    }}
-                  >
-                    <Image
-                      src={game.cover?.url?.replace("t_thumb", "t_cover_big")}
-                      alt={game.name}
-                      h="100%"
-                      fit="cover"
-                    />
-                  </Box>
+                  <Stack gap="xs" align="center">
+                    <Box
+                      onClick={() => setActiveIndex(index)}
+                      style={{
+                        cursor: "pointer",
+                        transition:
+                          "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                        transform:
+                          activeIndex === index
+                            ? "scale(1.25) translateY(-5px)"
+                            : "scale(1)",
+                        opacity: activeIndex === index ? 1 : 0.6,
+                        border:
+                          activeIndex === index
+                            ? "2px solid rgba(255,255,255,0.8)"
+                            : "2px solid transparent",
+                        borderRadius: "12px",
+                        overflow: "hidden",
+                        aspectRatio: "1/1",
+                        boxShadow:
+                          activeIndex === index
+                            ? "0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.2)"
+                            : "none",
+                      }}
+                    >
+                      <Image
+                        src={game.cover?.url?.replace("t_thumb", "t_cover_big")}
+                        alt={game.name}
+                        h="100%"
+                        fit="cover"
+                      />
+                    </Box>
+                    {/* Game Info Overlay */}
+                    <Stack
+                      gap={2}
+                      align="center"
+                      style={{
+                        transition: "all 0.4s ease",
+                        opacity: activeIndex === index ? 1 : 0,
+                        transform:
+                          activeIndex === index
+                            ? "translateY(0)"
+                            : "translateY(20px)",
+                        pointerEvents: "none",
+                        marginTop: "10px",
+                        width: 150,
+                      }}
+                    >
+                      <Text
+                        fw={800}
+                        size="md"
+                        truncate="end"
+                        ta="center"
+                        style={{
+                          textShadow: "0 2px 4px rgba(0,0,0,0.5)",
+                          width: "100%",
+                        }}
+                      >
+                        {game.name}
+                      </Text>
+                      <Group gap={6} opacity={0.7}>
+                        <IconClock size={14} />
+                        <Text size="xs" fw={700}>
+                          {formatPlayTime(userData?.playTime?.[game.id] || 0)}
+                        </Text>
+                      </Group>
+                    </Stack>
+                  </Stack>
                 </Carousel.Slide>
               ))}
 

@@ -26,8 +26,6 @@ import {
   IconHeart,
   IconSparkles,
   IconWindowMinimize,
-  IconArrowLeft,
-  IconArrowRight,
   IconPlus,
   IconFilePlus,
   IconSearch,
@@ -70,11 +68,6 @@ export function AppLayoutShell({ children }: { children: React.ReactNode }) {
   const [metadatas, setMetadatas] = React.useState<Record<number, Game>>({});
   const [isClient, setIsClient] = React.useState(false);
   const [isMaximized, setIsMaximized] = React.useState(false);
-  const [swipeProgress, setSwipeProgress] = React.useState(0);
-  const [swipeDirection, setSwipeDirection] = React.useState<
-    "back" | "forward" | null
-  >(null);
-  const [isPrimed, setIsPrimed] = React.useState(false);
   const [hasUpdateAvailable, setHasUpdateAvailable] = React.useState(false);
 
   React.useEffect(() => {
@@ -137,69 +130,6 @@ export function AppLayoutShell({ children }: { children: React.ReactNode }) {
       });
     }
   }, [activeDownloads]);
-
-  const navCooldown = React.useRef(0);
-  const horizontalMomentum = React.useRef(0);
-
-  React.useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX) * 1.5) {
-        if (!isPrimed) {
-          horizontalMomentum.current = 0;
-          setSwipeProgress(0);
-          setSwipeDirection(null);
-        }
-        return;
-      }
-
-      if (Date.now() - navCooldown.current < 500) {
-        horizontalMomentum.current = 0;
-        return;
-      }
-
-      horizontalMomentum.current += e.deltaX;
-
-      const threshold = 100;
-      const absMomentum = Math.abs(horizontalMomentum.current);
-      const direction = horizontalMomentum.current < 0 ? "back" : "forward";
-
-      setSwipeDirection(direction);
-      const progress = Math.min(100, (absMomentum / threshold) * 100);
-      setSwipeProgress(progress);
-
-      if (progress >= 95) {
-        setIsPrimed(true);
-      } else {
-        setIsPrimed(false);
-      }
-
-      clearTimeout((window as any)._gestureResetTimeout);
-      (window as any)._gestureResetTimeout = setTimeout(() => {
-        if (isPrimed) {
-          if (horizontalMomentum.current < -threshold) {
-            router.back();
-          } else if (horizontalMomentum.current > threshold) {
-            router.forward();
-          }
-          navCooldown.current = Date.now();
-        }
-
-        horizontalMomentum.current = 0;
-        setSwipeProgress(0);
-        setSwipeDirection(null);
-        setIsPrimed(false);
-      }, 50);
-    };
-
-    window.addEventListener("wheel", handleWheel, {
-      capture: true,
-      passive: true,
-    });
-    return () => {
-      window.removeEventListener("wheel", handleWheel);
-      clearTimeout((window as any)._gestureResetTimeout);
-    };
-  }, [router, isPrimed]);
 
   const downloadingCount = Object.values(activeDownloads).filter(
     (d: any) => d.status !== "completed" && d.status !== "error",
@@ -583,66 +513,6 @@ export function AppLayoutShell({ children }: { children: React.ReactNode }) {
       <ManualAddGameModal opened={manualAddModalOpened} onClose={closeManual} />
       {bigPictureMode && (
         <BigPictureView onClose={() => setBigPictureMode(false)} />
-      )}
-
-      {/* Swipe Indicator Overlay */}
-      {swipeDirection && swipeProgress > 0 && (
-        <Box
-          style={{
-            position: "fixed",
-            top: "50%",
-            transition: "all 0.1s ease-out",
-            opacity: swipeProgress / 100,
-            transform: `translateY(-50%)`,
-            left:
-              swipeDirection === "back"
-                ? -40 + (swipeProgress / 100) * 100
-                : "auto",
-            right:
-              swipeDirection === "forward"
-                ? -40 + (swipeProgress / 100) * 100
-                : "auto",
-            zIndex: 10000,
-            pointerEvents: "none",
-          }}
-        >
-          <Box
-            style={{
-              width: 60,
-              height: 60,
-              borderRadius: "50%",
-              backgroundColor: "rgba(255, 255, 255, 0.1)",
-              backdropFilter: "blur(8px)",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
-            }}
-          >
-            {swipeDirection === "back" ? (
-              <IconArrowLeft
-                size={34}
-                color={isPrimed ? "#ff006e" : "#ff006e88"}
-                style={{
-                  transform: `scale(${0.6 + (swipeProgress / 100) * 0.4})`,
-                  transition: "all 0.15s ease-out",
-                  filter: isPrimed ? "drop-shadow(0 0 8px #ff006e)" : "none",
-                }}
-              />
-            ) : (
-              <IconArrowRight
-                size={34}
-                color={isPrimed ? "#ff006e" : "#ff006e88"}
-                style={{
-                  transform: `scale(${0.6 + (swipeProgress / 100) * 0.4})`,
-                  transition: "all 0.15s ease-out",
-                  filter: isPrimed ? "drop-shadow(0 0 8px #ff006e)" : "none",
-                }}
-              />
-            )}
-          </Box>
-        </Box>
       )}
     </AppShell>
   );

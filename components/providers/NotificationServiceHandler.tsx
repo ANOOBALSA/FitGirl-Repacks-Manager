@@ -303,7 +303,7 @@ export function NotificationServiceHandler() {
             </Stack>
 
             <Group grow mt="xl">
-              {!updateStatus.downloading && !updateStatus.installerPath && (
+              {!updateStatus.downloading && (
                 <Button
                   variant="subtle"
                   color="gray"
@@ -346,8 +346,6 @@ export function NotificationServiceHandler() {
                   </Group>
                 </Stack>
               )}
-
-
 
               {!updateStatus.downloading && !updateStatus.installerPath && (
                 <Button
@@ -400,6 +398,25 @@ export function NotificationServiceHandler() {
                   }}
                 >
                   Download & Install
+                </Button>
+              )}
+
+              {!updateStatus.downloading && updateStatus.installerPath && (
+                <Button
+                  color="green"
+                  radius="md"
+                  size="md"
+                  fullWidth
+                  leftSection={<IconRefresh size={18} />}
+                  onClick={() => {
+                    if (updateStatus.installerPath) {
+                      (window as any).electron.installUpdate(
+                        updateStatus.installerPath,
+                      );
+                    }
+                  }}
+                >
+                  Install Now
                 </Button>
               )}
             </Group>
